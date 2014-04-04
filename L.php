@@ -1,7 +1,10 @@
 <?php
-require(dirname(__FILE__).'/base/Base.php');
-use L\Base as Base;
+require(dirname(__FILE__).'/base/Controller.php');
+use L\Controller as Controller;
 
 function l($string = NULL){
-	return new Base;
+	if(!isset($GLOBALS['Controller'])){
+		$GLOBALS['Controller'] = new Controller;
+	}
+	return $GLOBALS['Controller'];
 }

@@ -4,6 +4,6 @@ return [
 	'route'=>[
 		'defaultController'=>'Index',
 		'defaultAction'=>'index',
-    'module'=>[]
+    	'module'=>[]
 	],
 ];

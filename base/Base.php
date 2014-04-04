@@ -1,44 +1,41 @@
 <?php
 namespace L;
+
+defined('APP_PATH') or define('APP_PATH',dirname(__FILE__).'/../../app');
+
 class Base{
-
-	public $config = [];
 	
+	public $config = [];
+
 	public function __construct(){
-		$this->route();
 		$this->init();
-	}
-
-	public function __get($name){
-		if(isset($this->config[$name])){
-			return $this->config[$name];
-		}else{
-			$method = 'get'.$name;
-			return $this->$method();
-		}
-	}
-
-	public function __call($name,$arguments){
-		echo $name.' function is not exist!';
 	}
 
 	public function init(){
 		$defaultConfig = require(dirname(__FILE__).'/config.php');
-		$userConfig    = 0;
+		$userConfig    = require(rtrim(APP_PATH,'/').'/config.php');
+		try{
+			$this->config  = $this->multi_array_merge($defaultConfig,$userConfig);
+		}catch(\Exception $e){
+			echo 'Caught exception: ',  $e->getMessage(), "\n";
+		}
 	}
 
-	public function getUrl(){
-		return $this->domain.$_SERVER['REQUEST_URI'];
-	}
+	public function multi_array_merge($config,$userConfig){
+		if(is_array($userConfig)){
+			foreach ($userConfig as $k => $v) {
+				if(is_array($v)){
+					$config[$k] = $this->multi_array_merge($config[$k],$v);
+				}else{
+					if(!empty($v)){
+						$config[$k] = $v;
+					}
+				}
+			}
+		}else{
+			throw new \Exception('Config must be array!');
+		}
 
-	public function getDomain(){
-		return $_SERVER['HTTP_HOST'];
+		return $config;
 	}
-
-	public function route(){
-		$param = $_SERVER['PATH_INFO'];
-		$params = explode('/', $param);
-		$controller = array_shift(array);
-	}
-
 }
