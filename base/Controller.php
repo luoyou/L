@@ -1,7 +1,7 @@
 <?php
 namespace L;
+use Exception;
 require('Base.php');
-use L\Base as Base;
 
 class Controller extends Base{
 
@@ -53,7 +53,7 @@ class Controller extends Base{
 		$this->action 	  = $action;
 		try{
 			$this->initAction();			
-		}catch(\Exception $e){
+		}catch(Exception $e){
 			echo 'Caught exception: ',  $e->getMessage(), "\n";
 		}
 	}
@@ -61,9 +61,9 @@ class Controller extends Base{
 	public function initAction(){
 		$file = rtrim(APP_PATH,'/').'/controller/'.$this->controller.'.php';
 		if(!file_exists($file)){
-			throw new \Exception($this->controller."php file is not exist");
+			throw new Exception($this->controller."php file is not exist");
 		}
-		require($file);
+		$xxx = require($file);
 		$className = $this->controller;
 		$controller = new $className; 
 

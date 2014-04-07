@@ -1,5 +1,6 @@
 <?php
 namespace L;
+use Exception;
 
 defined('APP_PATH') or define('APP_PATH',dirname(__FILE__).'/../../app');
 
@@ -16,7 +17,7 @@ class Base{
 		$userConfig    = require(rtrim(APP_PATH,'/').'/config.php');
 		try{
 			$this->config  = $this->multi_array_merge($defaultConfig,$userConfig);
-		}catch(\Exception $e){
+		}catch(Exception $e){
 			echo 'Caught exception: ',  $e->getMessage(), "\n";
 		}
 	}
@@ -33,7 +34,7 @@ class Base{
 				}
 			}
 		}else{
-			throw new \Exception('Config must be array!');
+			throw new Exception('Config must be array!');
 		}
 
 		return $config;
