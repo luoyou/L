@@ -6,4 +6,12 @@ return [
 		'defaultAction'=>'index',
     	'module'=>[]
 	],
+    'db'=>[
+
+    ],
+    'method'=>[
+        'symbol'=>[
+            '@'=>'model',
+        ]
+    ]
 ];

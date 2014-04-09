@@ -1,20 +1,26 @@
 <?php
 namespace{
+    defined('APP_PATH') or define('APP_PATH',dirname(__FILE__).'/../app');
+    define('APP', rtrim(APP_PATH,'/').'/');
+
     function l($string = NULL){
-        if(!isset($GLOBALS['Base'])){
-            $GLOBALS['Base'] = new L\Base;
+        if($string === NULL){
+            if(!isset($GLOBALS['Base'])){
+                $GLOBALS['Base'] = new L\Base;
+            }
+            return $GLOBALS['Base'];
         }
-        return $GLOBALS['Base'];
+
+        $parse = new L\Parse($string);
+        return $parse->main();;
     }
 }
 
 namespace L{
-    defined('APP_PATH') or define('APP_PATH',dirname(__FILE__).'/../app');
-
     function luoAutoLoader($className){
         if(strstr($className,'app') !== false){
             $className = str_replace('app\\', '', $className);
-            $file = rtrim(APP_PATH,'/').'/'.$className.'.php';
+            $file = APP.$className.'.php';
         }else{
             $className = str_replace(__NAMESPACE__.'\\', '', $className);
             $file = __DIR__.'/'.$className.'.php';

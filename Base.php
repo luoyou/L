@@ -4,16 +4,16 @@ use Exception;
 
 class Base{
 
-    use Process; 
+    public $config = [];
 
-	public function __construct(){
-		$this->init();
-	}
+    public function __construct(){
+        $this->init();
+    }
 
-	public function init(){
+    public function init(){
         $this->getConfig();
         $this->route();
-	}
+    }
 
     public function route(){
         $controller = $this->route['defaultController'];
@@ -34,17 +34,73 @@ class Base{
         try{
             $this->initAction($controller, $action);
         }catch(Exception $e){
-            echo 'Caught exception: ',  $e->getMessage(), "\n";
+            echo 'Caught exception: ',$e->getMessage(),", at ",$e->getFile()," line ",$e->getLine(),"\n";
         }
     }
 
     public function initAction($controller, $action){
-        $file = rtrim(APP_PATH,'/').'/controller/'.$controller.'.php';
+        $file = APP.'controller/'.$controller.'Controller.php';
         if(!file_exists($file)){
             throw new Exception($this->controller.".php file is not exist");
         }
-        $className = 'app\\controller\\'.$controller;
+        $className = 'app\\controller\\'.$controller.'Controller';
         $controller = new $className;
         $controller->$action();
+    }
+
+    public function getConfig(){
+        $defaultConfig = require(dirname(__FILE__) . '/config.php');
+        $userConfig    = require(APP.'config.php');
+        try{
+            $this->config  = $this->multi_array_merge($defaultConfig,$userConfig);
+        }catch(Exception $e){
+            echo 'Caught exception: Config ',  $e->getMessage(), "\n";
+        }
+    }
+
+    public function __get($name){
+        if(isset($this->config[$name])){
+            return $this->config[$name];
+        }
+        switch ($name) {
+            case 'domain':
+                return $this->getDomain();
+                break;
+
+            case 'url':
+                return $this->getUrl();
+                break;
+        }
+    }
+
+    public function __call($name,$arguments){
+        echo $name.' function is not exist!';
+    }
+
+    public function multi_array_merge($arr,$arr1){
+        if(is_array($arr1)){
+            foreach ($arr1 as $k => $v) {
+                if(is_array($v)){
+                    isset($arr[$k]) or $arr[$k] = [];
+                    $arr[$k] = $this->multi_array_merge($arr[$k],$v);
+                }else{
+                    if(isset($v)){
+                        $arr[$k] = $v;
+                    }
+                }
+            }
+        }else{
+            throw new Exception('must be array!');
+        }
+
+        return $arr;
+    }
+
+    public function getUrl(){
+        return $this->domain.$_SERVER['REQUEST_URI'];
+    }
+
+    public function getDomain(){
+        return $_SERVER['HTTP_HOST'];
     }
 }
