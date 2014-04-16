@@ -7,7 +7,10 @@ return [
     	'module'=>[]
 	],
     'db'=>[
-
+        'connectionString' => 'mysql:',
+        'username' => 'root',
+        'password' => '',
+        'tablePrefix'=>'',
     ],
     'method'=>[
         'symbol'=>[
