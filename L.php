@@ -11,7 +11,7 @@ namespace{
             return $GLOBALS['Base'];
         }
 
-        $parse = new L\Parse($string);
+        $parse = new L\route\Parse($string);
         return $parse->main();;
     }
 }

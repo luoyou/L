@@ -1,5 +1,5 @@
 <?php
-namespace L;
+namespace L\route;
 use Exception;
 
 class Controller{

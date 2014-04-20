@@ -1,5 +1,5 @@
 <?php
-namespace L;
+namespace L\db;
 use PDO;
 class Model {
 
@@ -7,6 +7,7 @@ class Model {
     public $table;
     public $order = NULL;
     public $limit = NULL;
+    public $errors = [];
     public $params = [];
     public $statement;
     public $tablePrefix = '';
@@ -57,6 +58,21 @@ class Model {
       $this->buildSelectStatement();
       $this->attribute = $this->execute()->fetch(PDO::FETCH_ASSOC);
       return $this;
+    }
+
+    public function count(){
+      $this->statement  = 'select count(*) as row_num from ';
+      $this->statement .= $this->table;
+      if($this->condition !== NULL){
+        $this->statement .= ' '.$this->condition;
+      }
+      
+      return $this->execute()->fetch(PDO::FETCH_ASSOC)['row_num'];
+    }
+
+    public function validate(){
+      new Validate($this);
+      var_dump($this->limit);
     }
 
     public function buildSelectStatement(){
