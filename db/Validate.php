@@ -3,9 +3,19 @@ namespace L\db;
 
 class Validate {
 
-  public function __construct($model){
-    $model->limit = 1;
-    var_dump($model);
+  public $requireError = '字段不能为空';
+  public $typeError = '字段类型必须为';
+
+  public function __construct(){
+    
+  }
+
+  public function required(){
+
+  }
+
+  public function length(){
+
   }
 
 }

@@ -71,8 +71,13 @@ class Model {
     }
 
     public function validate(){
-      new Validate($this);
-      var_dump($this->limit);
+      $validate = new Validate;
+      foreach ($this->rules as $v) {
+        $columns = array_shift($v);
+        array_walk($v, function($value,$key)use($validate){
+          $validate->$key();
+        });
+      }
     }
 
     public function buildSelectStatement(){
