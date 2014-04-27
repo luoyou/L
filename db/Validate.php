@@ -3,19 +3,24 @@ namespace L\db;
 
 class Validate {
 
-  public $requireError = '字段不能为空';
-  public $typeError = '字段类型必须为';
+    public $requireError = '字段不能为空';
+    public $typeError = '字段类型必须为';
+    public $model;
 
-  public function __construct(){
-    
-  }
+    public function __construct(){
 
-  public function required(){
+    }
 
-  }
+    public function necessary($state = true){
+        if($state !== true){
 
-  public function length(){
+        }else{
+            
+        }
+    }
 
-  }
+    public function length(){
+
+    }
 
 }
