@@ -18,22 +18,23 @@ class Model {
         $db = l()->db;
         $this->dsn = $db['connectionString'];
         $this->tablePrefix = $db['tablePrefix'];
-        if ( !isset( $GLOBALS['db'] ) ) {
-            $GLOBALS['db'] = new PDO( $db['connectionString'], $db['username'], $db['password'] );
+        if (!isset($GLOBALS['db'])) {
+            $GLOBALS['db'] = new PDO($db['connectionString'], $db['username'], $db['password']);
         }
         $this->db = $GLOBALS['db'];
         $this->getTableName();
         $this->init();
+        $this->getColumn();
     }
 
-    public function __get( $name ) {
-        if ( isset( $this->attribute[$name] ) ) {
+    public function __get($name) {
+        if (isset($this->attribute[$name])) {
             return $this->attribute[$name];
         }
     }
 
-    public function __set( $name, $value ) {
-        if ( isset( $this->attribute[$name] ) ) {
+    public function __set($name, $value) {
+        if (isset($this->attribute[$name])) {
             $this->attribute[$name] = $value;
         }
     }
@@ -42,11 +43,16 @@ class Model {
 
     }
 
+    public function setAttributes($attribute){
+        $this->attribute = $attribute;
+        return $this;
+    }
+
     public function findAll() {
         $this->buildSelectStatement();
-        $resultArray = $this->execute()->fetchAll( PDO::FETCH_ASSOC );
+        $resultArray = $this->execute()->fetchAll(PDO::FETCH_ASSOC);
         $results = [];
-        foreach ( $resultArray as $k => $v ) {
+        foreach ($resultArray as $k => $v) {
             $results[$k] = clone $this;
             $results[$k]->attribute = $v;
         }
@@ -54,75 +60,69 @@ class Model {
     }
 
     public function find() {
-        $this->limit( 1 );
+        $this->limit(1);
         $this->buildSelectStatement();
-        $this->attribute = $this->execute()->fetch( PDO::FETCH_ASSOC );
+        $this->attribute = $this->execute()->fetch(PDO::FETCH_ASSOC);
         return $this;
     }
 
     public function count() {
         $this->statement  = 'select count(*) as row_num from ';
         $this->statement .= $this->table;
-        if ( $this->condition !== NULL ) {
+        if ($this->condition !== NULL) {
             $this->statement .= ' '.$this->condition;
         }
 
-        return $this->execute()->fetch( PDO::FETCH_ASSOC )['row_num'];
+        return $this->execute()->fetch(PDO::FETCH_ASSOC)['row_num'];
     }
 
     public function validate() {
         $validate = new Validate;
-        foreach ($this->rules as $v) {
-            $field = array_shift($v);
-            $columns = explode(',', $field);
-            foreach ($columns as $column) {
-                array_walk($v, function($v, $k) use($column, $validate){
-                    $validate->field = $column;
-                    $validate->model = $this;
-                    $validate->$k($v);
-                });
-            }
-        }
+        $validate->model = $this;
+        $validate->rules = $this->rules;
+        $validate->execute();
+
+        var_dump($this);
     }
 
     public function buildSelectStatement() {
         $this->statement  = 'select * from ';
         $this->statement .= $this->table;
-        if ( $this->condition !== NULL ) {
+        if ($this->condition !== NULL) {
             $this->statement .= ' '.$this->condition;
         }
 
-        if ( $this->order !== NULL ) {
+        if ($this->order !== NULL) {
             $this->statement .= ' '.$this->order;
         }
 
-        if ( $this->limit !== NULL ) {
+        if ($this->limit !== NULL) {
             $this->statement .= ' '.$this->limit;
         }
     }
 
-    public function execute( $prepare = NULL ) {
+    public function execute($prepare = NULL) {
         $prepare or $prepare = $this->statement;
-        $statement = $this->db->prepare( $prepare );
-        foreach ( $this->params as $k => $v ) {
-            $statement->bindValue( $k, $v );
+        $statement = $this->db->prepare($prepare);
+        foreach ($this->params as $k => $v) {
+            $statement->bindValue($k, $v);
         }
         $statement->execute();
         return $statement;
     }
 
-    public function where( $condition ) {
+    public function where($condition) {
         $this->condition = 'where ';
-        if ( is_string( $condition ) ) {
+        if (is_string($condition)) {
             $this->condition .= $condition;
         }
 
-        if ( is_array( $condition ) ) {
-            $length = count( $condition );
+        if (is_array($condition)) {
+            $length = count($condition);
             $i = 0;
-            foreach ( $condition as $k => $v ) {
+            foreach ($condition as $k => $v) {
                 $i++;
-                if ( $i == $length ) {
+                if ($i == $length) {
                     $this->condition .= "$k = '$v'";
                 }else {
                     $this->condition .= "$k = '$v'&&";
@@ -132,39 +132,39 @@ class Model {
         return $this;
     }
 
-    public function limit( $limit ) {
+    public function limit($limit) {
         $this->limit = 'limit '.$limit;
         return $this;
     }
 
-    public function order( $order ) {
+    public function order($order) {
         $this->order = 'order by '.$order;
         return $this;
     }
 
     public function getColumn() {
         $statement = 'show columns from '.$this->table;
-        $result = $this->db->query( $statement );
-        $columns = $result->FetchAll( PDO::FETCH_ASSOC );
-        foreach ( $columns as $k => $v ) {
+        $result = $this->db->query($statement);
+        $columns = $result->FetchAll(PDO::FETCH_ASSOC);
+        foreach ($columns as $k => $v) {
             $this->attribute[$v['Field']] = '';
         }
     }
 
     public function getTableName() {
-        $class = get_class( $this );
-        $classPath = explode( '\\', $class );
-        $table = end( $classPath );
-        $strArr = str_split( $table );
-        foreach ( $strArr as $k => $v ) {
-            if ( $k !== 0 ) {
-                if ( $v === strtoupper( $v ) ) {
-                    $strArr[$k] = '_'.strtolower( $v );
+        $class = get_class($this);
+        $classPath = explode('\\', $class);
+        $table = end($classPath);
+        $strArr = str_split($table);
+        foreach ($strArr as $k => $v) {
+            if ($k !== 0) {
+                if ($v === strtoupper($v)) {
+                    $strArr[$k] = '_'.strtolower($v);
                 }
             }else {
-                $strArr[$k] = strtolower( $v );
+                $strArr[$k] = strtolower($v);
             }
         }
-        $this->table = $this->tablePrefix.implode( $strArr );
+        $this->table = $this->tablePrefix.implode($strArr);
     }
 }

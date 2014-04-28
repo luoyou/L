@@ -41,10 +41,11 @@ class Base{
     public function initAction($controller, $action){
         $file = APP.'controller/'.$controller.'Controller.php';
         if(!file_exists($file)){
-            throw new Exception($this->controller.".php file is not exist");
+            throw new Exception($controller.".php file is not exist");
         }
         $className = 'app\\controller\\'.$controller.'Controller';
         $controller = new $className;
+        $action = 'action'.$action;
         $controller->$action();
     }
 
