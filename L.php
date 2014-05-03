@@ -12,7 +12,7 @@ namespace{
         }
 
         $parse = new L\route\Parse($string);
-        return $parse->main();;
+        return $parse->main();
     }
 }
 

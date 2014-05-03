@@ -20,6 +20,7 @@ class Validate {
         $field_str = array_shift($rule);
         $fields    = explode(',', $field_str);
         foreach ($fields as $field) {
+            $field = trim($field);
             foreach ($rule as $k => $v) {
                 if(method_exists($this, $k)){
                     $this->$k($field, $v);
@@ -31,29 +32,45 @@ class Validate {
     }
 
     public function type($field, $type){
-        
+        switch ($type) {
+            case 'numeric':
+                if(!is_numeric($this->model->$field)){
+                    $this->errorMessage($field, '必须为数字类型');
+                }
+                break;
+            case 'int':
+                if(!is_int($this->model->$field)){
+                    $this->errorMessage($field, '必须为整型');   
+                }
+                break;
+            case 'string':
+                if(!is_string(var)){
+                    $this->errorMessage($field, '必须为整型');   
+                }
+                break;
+        }
     }
 
     public function compare($field, $params){
         $c = $params['condition'];
         if($c == '='){
-            if($this->model->filed != $this->model->$params['field']){
+            if($this->model->$field != $this->model->$params['field']){
                 $this->errorMessage($field, '不'.$c.$params['field'].'字段');
             }
         }elseif($c == '>') {
-            if($this->model->filed <= $this->model->$params['field']){
+            if($this->model->$field <= $this->model->$params['field']){
                 $this->errorMessage($field, '不'.$c.$params['field'].'字段');
             }
         }elseif($c == '>='){
-            if($this->model->filed < $this->model->$params['field']){
+            if($this->model->$field < $this->model->$params['field']){
                 $this->errorMessage($field, '不'.$c.$params['field'].'字段');
             }
         }elseif($c == '<'){
-            if($this->model->filed >= $this->model->$params['field']){
+            if($this->model->$field >= $this->model->$params['field']){
                 $this->errorMessage($field, '不'.$c.$params['field'].'字段');
             }
         }elseif($c == '<='){
-            if($this->model->filed > $this->model->$params['field']){
+            if($this->model->$field > $this->model->$params['field']){
                 $this->errorMessage($field, '不'.$c.$params['field'].'字段');
             }
         }
