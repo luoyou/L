@@ -31,6 +31,8 @@ class Validate {
         }
     }
 
+    // public function 
+
     public function type($field, $type){
         switch ($type) {
             case 'numeric':
@@ -44,8 +46,8 @@ class Validate {
                 }
                 break;
             case 'string':
-                if(!is_string(var)){
-                    $this->errorMessage($field, '必须为整型');   
+                if(!is_string($this->model->$field)){
+                    $this->errorMessage($field, '必须为字符串');   
                 }
                 break;
         }
