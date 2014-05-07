@@ -31,7 +31,13 @@ class Validate {
         }
     }
 
-    // public function 
+    public function match($field, $arguments){
+        $regular = $arguments['regular'];
+        $errormessage = $arguments['errorMessage'];
+        if(!preg_match($regular, $this->model->$field)){
+            $this->errormessage($field, $errormessage);
+        }
+    }
 
     public function type($field, $type){
         switch ($type) {

@@ -11,20 +11,24 @@ class Model {
     public $params = [];
     public $statement;
     public $tablePrefix = '';
+    public $columns;
+    public $primaryKey;
     public $condition = NULL;
     public $attribute = [];
+    public $verified = false;
 
     public function __construct() {
-        $db = l()->db;
-        $this->dsn = $db['connectionString'];
-        $this->tablePrefix = $db['tablePrefix'];
-        if (!isset($GLOBALS['db'])) {
-            $GLOBALS['db'] = new PDO($db['connectionString'], $db['username'], $db['password']);
+        $db_config = l()->db;          // get database config
+        $this->dsn = $db_config['connectionString'];
+        $this->tablePrefix = $db_config['tablePrefix'];
+        static $db;
+        if (!isset($db)) {
+            $db = new PDO($db['connectionString'], $db['username'], $db['password']);
         }
         $this->db = $GLOBALS['db'];
-        $this->getTableName();
-        $this->init();
+        $this->getTableName();  // 获取表名
         $this->getColumn();
+        $this->init();
     }
 
     public function __get($name) {
@@ -81,8 +85,11 @@ class Model {
         $validate->model = $this;
         $validate->rules = $this->rules;
         $validate->execute();
+        if(!empty($this->errors)){
+            $this->verified = true;
+        }
 
-        var_dump($this);
+        return $this;
     }
 
     public function buildSelectStatement() {
@@ -142,12 +149,28 @@ class Model {
         return $this;
     }
 
+    public function save(){
+        if($this->verified !== true && empty($this->errors)){
+            $this->validate();
+        }
+
+        if($this->verified !== true){
+
+        }else{
+            // if($this->)
+        }
+    }
+
     public function getColumn() {
         $statement = 'show columns from '.$this->table;
         $result = $this->db->query($statement);
         $columns = $result->FetchAll(PDO::FETCH_ASSOC);
-        foreach ($columns as $k => $v) {
-            $this->attribute[$v['Field']] = '';
+        var_dump($columns);
+        foreach ($columns as $v) {
+            $this->columns[] = $v['Field'];
+            if($v['Key'] == 'PRI'){
+                $this->primaryKey = $v['Field'];
+            }
         }
     }
 

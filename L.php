@@ -5,10 +5,12 @@ namespace{
 
     function l($string = NULL){
         if($string === NULL){
-            if(!isset($GLOBALS['Base'])){
-                $GLOBALS['Base'] = new L\Base;
+            static $base;
+            if(!isset($base)){
+                $base = new L\Base;
+                $base->route();
             }
-            return $GLOBALS['Base'];
+            return $base;
         }
 
         $parse = new L\route\Parse($string);

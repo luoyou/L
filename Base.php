@@ -7,12 +7,12 @@ class Base{
     public $config = [];
 
     public function __construct(){
+        $this->getConfig();
         $this->init();
     }
 
     public function init(){
-        $this->getConfig();
-        $this->route();
+
     }
 
     public function route(){
