@@ -52,7 +52,13 @@ class Model {
         return $this;
     }
 
-    public function findAll() {
+    /**
+     * findAll description
+     * @param  array $params
+     * @return find results
+     */
+    public function findAll($params = []) {
+        $this->params = $params;
         $this->buildSelectStatement();
         $resultArray = $this->execute()->fetchAll(PDO::FETCH_ASSOC);
         $results = [];
@@ -63,7 +69,13 @@ class Model {
         return $results;
     }
 
-    public function find() {
+    /**
+     * find description
+     * @param  array $params
+     * @return $this
+     */
+    public function find($params = []) {
+        $this->params = $params;
         $this->limit(1);
         $this->buildSelectStatement();
         $this->attribute = $this->execute()->fetch(PDO::FETCH_ASSOC);
@@ -124,7 +136,7 @@ class Model {
             $this->condition .= $condition;
         }
 
-        if (is_array($condition)) {
+        if (is_array($-)) {
             $length = count($condition);
             $i = 0;
             foreach ($condition as $k => $v) {
