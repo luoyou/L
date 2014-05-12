@@ -19,13 +19,12 @@ class Model {
 
     public function __construct() {
         $db_config = l()->db;          // get database config
-        $this->dsn = $db_config['connectionString'];
         $this->tablePrefix = $db_config['tablePrefix'];
         static $db;
         if (!isset($db)) {
-            $db = new PDO($db['connectionString'], $db['username'], $db['password']);
+            $db = new PDO($db_config['connectionString'], $db_config['username'], $db_config['password']);
         }
-        $this->db = $GLOBALS['db'];
+        $this->db = $db;
         $this->getTableName();  // 获取表名
         $this->getColumn();
         $this->init();
@@ -97,7 +96,7 @@ class Model {
         $validate->model = $this;
         $validate->rules = $this->rules;
         $validate->execute();
-        if(!empty($this->errors)){
+        if(empty($this->errors)){
             $this->verified = true;
         }
 
@@ -136,7 +135,7 @@ class Model {
             $this->condition .= $condition;
         }
 
-        if (is_array($-)) {
+        if (is_array($condition)) {
             $length = count($condition);
             $i = 0;
             foreach ($condition as $k => $v) {
@@ -167,17 +166,36 @@ class Model {
         }
 
         if($this->verified !== true){
-
-        }else{
-            // if($this->)
+            return false;
         }
+
+        $primaryKey = $this->primaryKey;
+        if(isset($this->$primaryKey) && $this->$primaryKey){
+            return $this->update();
+        }else{
+            return $this->insert();
+        }
+    }
+
+    public function insert(){
+        $columns = '';
+        $params  = '';
+        foreach ($this->columns as $v) {
+            $columns .= $v.',';
+            $params  .= ':'.$v.',';
+        }
+        $columns = rtrim($columns, ',');
+        $params = rtrim($params, ',');
+        $statement = 'insert into '.$this->table.' ('.$columns.') values ('.$params.')';
+        $this->db->prepare($statement);
+        echo $statement;
+
     }
 
     public function getColumn() {
         $statement = 'show columns from '.$this->table;
         $result = $this->db->query($statement);
         $columns = $result->FetchAll(PDO::FETCH_ASSOC);
-        var_dump($columns);
         foreach ($columns as $v) {
             $this->columns[] = $v['Field'];
             if($v['Key'] == 'PRI'){
