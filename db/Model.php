@@ -122,10 +122,7 @@ class Model {
     public function execute($prepare = NULL) {
         $prepare or $prepare = $this->statement;
         $statement = $this->db->prepare($prepare);
-        foreach ($this->params as $k => $v) {
-            $statement->bindValue($k, $v);
-        }
-        $statement->execute();
+        $statement->execute($this->params);
         return $statement;
     }
 
@@ -164,10 +161,15 @@ class Model {
         if($this->verified !== true && empty($this->errors)){
             $this->validate();
         }
-
+        
         if($this->verified !== true){
             return false;
         }
+
+        array_walk($this->attribute, function($v, $k){
+            in_array($k, $this->columns) and $this->params[':'.$k] = $v;
+        });
+        var_dump($this->params);
 
         $primaryKey = $this->primaryKey;
         if(isset($this->$primaryKey) && $this->$primaryKey){
@@ -181,14 +183,19 @@ class Model {
         $columns = '';
         $params  = '';
         foreach ($this->columns as $v) {
+            if($this->primaryKey == $v){
+                continue;
+            }
             $columns .= $v.',';
             $params  .= ':'.$v.',';
         }
         $columns = rtrim($columns, ',');
         $params = rtrim($params, ',');
-        $statement = 'insert into '.$this->table.' ('.$columns.') values ('.$params.')';
-        $this->db->prepare($statement);
-        echo $statement;
+        $this->statement = 'insert into '.$this->table.' ('.$columns.') values ('.$params.')';
+        $this->execute();
+    }
+
+    public function update(){
 
     }
 
