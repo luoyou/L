@@ -3,21 +3,91 @@ namespace L\db;
 use PDO, Exception;;
 class Model {
 
+    /**
+     * Database connect handle
+     * @var PDO Object
+     */
     public $db;
+
+    /**
+     * model operate mode, default insert
+     * @var string
+     */
+    public $mode;
+    
+    /**
+     * Database table name
+     * @var string
+     */
     public $table;
+
+    /**
+     * sql statement order condition
+     * @var string
+     */
     public $order = NULL;
+
+    /**
+     * sql statement limit condition
+     * @var string
+     */
     public $limit = NULL;
+
+    /**
+     * Validate errors
+     * @var array
+     */
     public $errors = [];
+
+    /**
+     * sql statement bind params
+     * @var array
+     */
     public $params = [];
+
+    /**
+     * sql statement
+     * @var string
+     */
     public $statement;
+
+    /**
+     * table prefix
+     * @var string
+     */
     public $tablePrefix = '';
+
+    /**
+     * table columns
+     * @var array
+     */
     public $columns;
+
+    /**
+     * table primary key
+     * @var string
+     */
     public $primaryKey;
+
+    /**
+     * sql statement condition
+     * @var string
+     */
     public $condition = NULL;
+
+    /**
+     * table columns attributes and value
+     * @var array
+     */
     public $attribute = [];
+
+    /**
+     * ensure attributes was verified
+     * @var boolean
+     */
     public $verified = false;
 
-    public function __construct() {
+    public function __construct($mode = 'insert') {
         $db_config = l()->db;          // get database config
         $this->tablePrefix = $db_config['tablePrefix'];
         static $db;
@@ -27,6 +97,7 @@ class Model {
         $this->db = $db;
         $this->getTableName();  // 获取表名
         $this->getColumn();
+        $this->mode = $mode;
         $this->init();
     }
 
@@ -60,6 +131,7 @@ class Model {
         $this->params = $params;
         $this->buildSelectStatement();
         $resultArray = $this->execute()->fetchAll(PDO::FETCH_ASSOC);
+        $this->mode = 'update';
         $results = [];
         foreach ($resultArray as $k => $v) {
             $results[$k] = clone $this;
@@ -78,6 +150,7 @@ class Model {
         $this->limit(1);
         $this->buildSelectStatement();
         $this->attribute = $this->execute()->fetch(PDO::FETCH_ASSOC);
+        $this->mode = 'update';
         return $this;
     }
 

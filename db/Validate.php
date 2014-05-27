@@ -19,7 +19,7 @@ class Validate {
     public function parseRule($rule){
         $field_str = array_shift($rule);
         $fields    = explode(',', $field_str);
-        foreach ($fields as $field) {
+        foreach($fields as $field) {
             $field = trim($field);
             foreach ($rule as $k => $v) {
                 if(method_exists($this, $k)){
