@@ -22,18 +22,6 @@ class Model {
     public $table;
 
     /**
-     * sql statement order condition
-     * @var string
-     */
-    public $order = NULL;
-
-    /**
-     * sql statement limit condition
-     * @var string
-     */
-    public $limit = NULL;
-
-    /**
      * Validate errors
      * @var array
      */
@@ -73,7 +61,11 @@ class Model {
      * sql statement condition
      * @var string
      */
-    public $condition = NULL;
+    public $condition = [
+        'where'=>NULL,
+        'limit'=>NULL,
+        'order'=>NULL,
+    ];
 
     /**
      * table columns attributes and value

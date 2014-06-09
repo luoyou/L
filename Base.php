@@ -74,9 +74,11 @@ class Base{
         }
     }
 
+    /*
     public function __call($name,$arguments){
         echo $name.' function is not exist!';
     }
+    */
 
     public function multi_array_merge($arr,$arr1){
         if(is_array($arr1)){
