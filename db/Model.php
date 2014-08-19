@@ -55,16 +55,17 @@ class Model {
      * table primary key
      * @var string
      */
-    public $primaryKey;
+    private $primaryKey;
 
     /**
      * sql statement condition
      * @var string
      */
-    public $condition = [
-        'where'=>NULL,
-        'limit'=>NULL,
-        'order'=>NULL,
+    protected $_condition = [
+        'where' => NULL,
+        'limit' => NULL,
+        'order' => NULL,
+        'join'  => NULL,
     ];
 
     /**
@@ -81,15 +82,15 @@ class Model {
 
     public function __construct($mode = 'insert') {
         $db_config = l()->db;          // get database config
-        $this->tablePrefix = $db_config['tablePrefix'];
         static $db;
         if (!isset($db)) {
             $db = new PDO($db_config['connectionString'], $db_config['username'], $db_config['password']);
         }
         $this->db = $db;
-        $this->getTableName();  // 获取表名
-        $this->getColumn();
+        $this->tablePrefix = $db_config['tablePrefix'];
         $this->mode = $mode;
+        $this->getTableName();  
+        $this->getColumn(); 
         $this->init();
     }
 
@@ -105,10 +106,14 @@ class Model {
         }
     }
 
-    public function init() {
+    protected function init() {
 
     }
 
+    /**
+     * set attributes
+     * @param array $attribute
+     */
     public function setAttributes($attribute){
         $this->attribute = $attribute;
         return $this;
@@ -171,16 +176,16 @@ class Model {
     public function buildSelectStatement() {
         $this->statement  = 'select * from ';
         $this->statement .= $this->table;
-        if ($this->condition !== NULL) {
-            $this->statement .= ' '.$this->condition;
+        if ($this->condition['where'] !== NULL) {
+            $this->statement .= ' '.$this->condition['where'];
         }
 
-        if ($this->order !== NULL) {
-            $this->statement .= ' '.$this->order;
+        if ($this->condition['order'] !== NULL) {
+            $this->statement .= ' '.$this->condition['order'];
         }
 
-        if ($this->limit !== NULL) {
-            $this->statement .= ' '.$this->limit;
+        if ($this->condition['limit'] !== NULL) {
+            $this->statement .= ' '.$this->condition['limit'];
         }
     }
 
@@ -192,9 +197,9 @@ class Model {
     }
 
     public function where($condition) {
-        $this->condition = 'where ';
+        $this->condition['where'] = 'where ';
         if (is_string($condition)) {
-            $this->condition .= $condition;
+            $this->condition['where'] .= $condition;
         }
 
         if (is_array($condition)) {
@@ -203,21 +208,21 @@ class Model {
             foreach ($condition as $k => $v) {
                 $i++;
                 if ($i == $length) {
-                    $this->condition .= "$k = '$v'";
+                    $this->condition['where'] .= "$k = '$v'";
                 }else {
-                    $this->condition .= "$k = '$v'&&";
+                    $this->condition['where'] .= "$k = '$v'&&";
                 }
             }
         }
         return $this;
     }
 
-    public function limit($limit) {
+    private function limit($limit) {
         $this->limit = 'limit '.$limit;
         return $this;
     }
 
-    public function order($order) {
+    private function order($order) {
         $this->order = 'order by '.$order;
         return $this;
     }
@@ -264,7 +269,7 @@ class Model {
 
     }
 
-    public function getColumn() {
+    private function getColumn() {
         $statement = 'show columns from '.$this->table;
         $result = $this->db->query($statement);
         $columns = $result->FetchAll(PDO::FETCH_ASSOC);
@@ -276,7 +281,7 @@ class Model {
         }
     }
 
-    public function getTableName() {
+    private function getTableName() {
         $class = get_class($this);
         $classPath = explode('\\', $class);
         $table = end($classPath);

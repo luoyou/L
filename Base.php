@@ -14,7 +14,7 @@ class Base{
     public function init(){
 
     }
-
+    
     public function route(){
         $controller = $this->route['defaultController'];
         $action  	= $this->route['defaultAction'];
